@@ -17,6 +17,7 @@ using System.Text.Json.Serialization;
 using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Utils;
+using FixVectorLeak;
 
 namespace SharpTimer
 {
@@ -146,7 +147,7 @@ namespace SharpTimer
         public double Sync { get; set; }
         public int GoodSync { get; set; }
         public int TotalSync { get; set; }
-        public List<QAngle> Rotation { get; set; } = new List<QAngle>();
+        public List<QAngle_t> Rotation { get; set; } = [];
 
         //player settings/stats
         public bool Azerty { get; set; }

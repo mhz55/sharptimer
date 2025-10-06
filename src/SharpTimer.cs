@@ -50,6 +50,8 @@ namespace SharpTimer
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) isLinux = true;
             else isLinux = false;
 
+            _ = new NoSlide(this);
+            
             if(isLinux)
             {
                 movementServices = 0;

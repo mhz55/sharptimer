@@ -144,7 +144,7 @@ namespace SharpTimer
                     playerTimers[player.Slot].TotalSync = 0;
                     playerTimers[player.Slot].GoodSync = 0;
                     playerTimers[player.Slot].Sync = 0;
-                    playerTimers[player.Slot].Rotation = new List<QAngle>();
+                    playerTimers[player.Slot].Rotation = [];
 
                     if (enableReplays)
                     {

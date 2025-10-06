@@ -16,6 +16,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Utils;
+using FixVectorLeak;
 using Vector = CounterStrikeSharp.API.Modules.Utils.Vector;
 
 namespace SharpTimer
@@ -217,34 +218,86 @@ namespace SharpTimer
             try
             {
                 var playerTimer = playerTimers[player.Slot];
-                bool left = false;
-                bool right = false;
-
-                #pragma warning disable CS0219 // annoyence
-                bool leftRight = false;
-                #pragma warning restore CS0219
+                bool strafingLeft = false;
+                bool strafingRight = false;
+                // Start with 100% sync initially
+                if (playerTimers[player.Slot].inStartzone) playerTimer.Sync = 100.00f;
 
                 if ((buttons & PlayerButtons.Moveleft) != 0 && (buttons & PlayerButtons.Moveright) != 0)
-                    leftRight = true;
+                {
+                    return; // Ignore if both left and right are pressed
+                }
                 else if ((buttons & PlayerButtons.Moveleft) != 0)
-                    left = true;
+                {
+                    strafingLeft = true;
+                }
                 else if ((buttons & PlayerButtons.Moveright) != 0)
-                    right = true;
-                else return;
+                {
+                    strafingRight = true;
+                }
+                else
+                {
+                    return; // Ignore if neither left nor right is pressed
+                }
 
-                QAngle newEyeAngle = new QAngle(eyeangle.X, eyeangle.Y, eyeangle.Z);
+                // Add the current eye angle to the rotation history
+                QAngle_t newEyeAngle = new QAngle_t(eyeangle.X, eyeangle.Y, eyeangle.Z);
                 playerTimer.Rotation.Add(newEyeAngle);
-                playerTimer.TotalSync++;
 
-                //Check left goodsync
-                if (playerTimer.Rotation != null && playerTimer.Rotation.Count > 1 && eyeangle.Y > playerTimer.Rotation[playerTimer.TotalSync - 2].Y && left)
-                    playerTimer.GoodSync++;
+                // Cap rotation history at 1000 entries
+                if (playerTimer.Rotation.Count > 1000)
+                {
+                    playerTimer.Rotation.RemoveAt(0); // Remove the oldest entry
+                }
 
-                //Check right goodsync
-                if (playerTimer.Rotation != null && playerTimer.Rotation.Count > 1 && eyeangle.Y < playerTimer.Rotation[playerTimer.TotalSync - 2].Y && right)
-                    playerTimer.GoodSync++;
+                // Only proceed if we have enough data points in Rotation
+                if (playerTimer.Rotation.Count > 1)
+                {
+                    float previousEyeAngleY = playerTimer.Rotation[playerTimer.Rotation.Count - 2].Y; // Use Rotation.Count - 2
+                    float currentEyeAngleY = eyeangle.Y;
 
-                playerTimer.Sync = Math.Round((float)playerTimers[player.Slot].GoodSync / playerTimers[player.Slot].TotalSync * 100, 0);
+                    // Normalize angle difference to handle wrapping from -180 to 180
+                    float deltaY = currentEyeAngleY - previousEyeAngleY;
+                    if (deltaY > 180)
+                    {
+                        deltaY -= 360;
+                    }
+                    else if (deltaY < -180)
+                    {
+                        deltaY += 360;
+                    }
+
+                    if (Math.Abs(deltaY) < 0.01f) return;
+
+                    bool onGround = ((PlayerFlags)player.Pawn.Value!.Flags & PlayerFlags.FL_ONGROUND) == PlayerFlags.FL_ONGROUND;
+                    if (onGround || (!onGround && (buttons & (PlayerButtons.Moveleft | PlayerButtons.Moveright)) == 0))
+                    {
+                        return; // Ignore calculation if the player is on the ground or airborne without pressing movement buttons
+                    }
+                    else
+                    {
+                        // Increment frames in the air
+                        playerTimer.TotalSync++;
+                    }
+
+                    // Determine rotation direction
+                    bool rotatingLeft = deltaY > 0;
+                    bool rotatingRight = deltaY < 0;
+
+                    // Add sync frame if strafing and rotating match and the player is airborne
+                    if (!onGround && ((strafingLeft && rotatingLeft) || (strafingRight && rotatingRight)))
+                    {
+                        playerTimer.GoodSync++; // Increment sync frames
+                    }
+                }
+
+                // Calculate sync percentage
+                if (playerTimer.TotalSync >= 2) // Adjust threshold as needed
+                {
+                    playerTimer.Sync = (playerTimer.TotalSync > 0)
+                        ? (playerTimer.GoodSync / (float)playerTimer.TotalSync) * 100
+                        : 0;
+                }
             }
             catch (Exception ex)
             {
