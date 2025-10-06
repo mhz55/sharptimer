@@ -1,5 +1,5 @@
 {
-  "prefix": "{lime}SharpTimer ●{white}",
+  "prefix": "{white}[{orange}PlayPark{white}] {gray}",
 
   //timer
   "timer_time": "Time: [{lime}{0}{default}] {1}",

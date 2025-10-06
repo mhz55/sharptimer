@@ -16,6 +16,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Entities.Constants;
+using CounterStrikeSharp.API.Modules.Memory;
 using CounterStrikeSharp.API.Modules.Utils;
 
 namespace SharpTimer
@@ -154,9 +155,17 @@ namespace SharpTimer
                             SetVelocity(player, player!.Pawn.Value!.AbsVelocity, 400);
                         }
 
-                        if(playerTimer.currentStyle.Equals(10) && !player.PlayerPawn.Value.GroundEntity.IsValid) //check if ff
+                        if(playerTimer.currentStyle.Equals(10) || playerTimer.currentStyle.Equals(11) && !player.PlayerPawn.Value.GroundEntity.IsValid) //check if ff
                         {
+                            var pawn = player.PlayerPawn.Value;
+                            if ((pawn.Flags & (1 << 0)) != 0) break;
                             AddTimer(2.0f, () => { IncreaseVelocity(player); });
+                        }
+
+
+                        if (playerTimer.currentStyle is 11 or 1)
+                        {
+                            player!.Pawn.Value!.ActualGravityScale = 0.5f;
                         }
 
                         if (isOnBhopBlock)

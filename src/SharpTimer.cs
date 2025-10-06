@@ -19,6 +19,7 @@ using CounterStrikeSharp.API.Core.Attributes;
 using CounterStrikeSharp.API.Modules.Cvars;
 using CounterStrikeSharp.API.Modules.Memory.DynamicFunctions;
 using System.Runtime.InteropServices;
+using CounterStrikeSharp.API.Modules.Memory;
 
 namespace SharpTimer
 {
@@ -30,6 +31,7 @@ namespace SharpTimer
         public required IRunCommand RunCommand;
         private int movementServices;
         private int movementPtr;
+
         public override void Load(bool hotReload)
         {
             SharpTimerConPrint("Loading Plugin...");
@@ -60,7 +62,7 @@ namespace SharpTimer
                 movementPtr = 2;
                 RunCommand = new RunCommandWindows();
             }
-
+            
             if(isLinux) RunCommand.Hook(OnRunCommand, HookMode.Pre);
 
             currentMapName = Server.MapName;

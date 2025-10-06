@@ -1,10 +1,15 @@
+using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
+using CounterStrikeSharp.API.Modules.Cvars;
 using Vector = CounterStrikeSharp.API.Modules.Utils.Vector;
 
 namespace SharpTimer
 {
     public partial class SharpTimer
     {
+        
+        
+        
         public void setStyle(CCSPlayerController player, int style)
         {
             AddTimer(0.1f, () =>
@@ -45,6 +50,9 @@ namespace SharpTimer
                     case 10:
                         SetFastForward(player);
                         return;
+                    case 11:
+                        SetLowgFastForward(player);
+                        return;
                     default:
                         return;
                 }
@@ -56,18 +64,25 @@ namespace SharpTimer
             playerTimers[player.Slot].currentStyle = 0; // reset currentStyle
             playerTimers[player.Slot].changedStyle = true;
             player!.Pawn.Value!.GravityScale = 1f;
+            player!.Pawn.Value!.ActualGravityScale = 1f;
+
         }
 
         public void SetLowGravity(CCSPlayerController player)
         {
             playerTimers[player.Slot].currentStyle = 1; // 1 = low-gravity
             player!.Pawn.Value!.GravityScale = 0.5f;
+            player!.Pawn.Value!.ActualGravityScale = 0.5f;
+            
             playerTimers[player.Slot].changedStyle = true;
         }
         public void SetHighGravity(CCSPlayerController player)
         {
             playerTimers[player.Slot].currentStyle = 5; // 5 = high-gravity
             player!.Pawn.Value!.GravityScale = 1.5f;
+            player!.Pawn.Value!.ActualGravityScale = 1.5f;
+
+           
             playerTimers[player.Slot].changedStyle = true;
         }
         public void SetSlowMo(CCSPlayerController player)
@@ -81,17 +96,39 @@ namespace SharpTimer
         {
             playerTimers[player.Slot].currentStyle = 2; // 2 = sideways
             playerTimers[player.Slot].changedStyle = true;
-        }
+            
+            player!.Pawn.Value!.GravityScale = 1f;
+            player!.Pawn.Value!.ActualGravityScale = 1f;
+           }
+        
         public void SetHalfSideways(CCSPlayerController player)
         {
             playerTimers[player.Slot].currentStyle = 9; // 9 = halfsideways
             playerTimers[player.Slot].changedStyle = true;
+            
+            player!.Pawn.Value!.GravityScale = 1f;
+            player!.Pawn.Value!.ActualGravityScale = 1f;
         }
         public void SetFastForward(CCSPlayerController player)
         {
             playerTimers[player.Slot].currentStyle = 10; // 10 = fastforward
             playerTimers[player.Slot].changedStyle = true;
+            
+            player!.Pawn.Value!.GravityScale = 1f;
+            player!.Pawn.Value!.ActualGravityScale = 1f;
         }
+        
+        public void SetLowgFastForward(CCSPlayerController player)
+        {
+            playerTimers[player.Slot].currentStyle = 11; // 10 = fastforward
+            playerTimers[player.Slot].changedStyle = true;
+            
+            player!.Pawn.Value!.GravityScale = 0.5f;
+            player!.Pawn.Value!.ActualGravityScale = 0.5f; 
+            
+        }
+
+   
 
         public void SetOnlyW(CCSPlayerController player)
         {
@@ -163,6 +200,10 @@ namespace SharpTimer
                     return "Half Sideways";
                 case 10:
                     return "Fast Forward";
+                case 11:
+                    return "Fast Low Gravity";
+                case 12:
+                    return "Legit";
                 default:
                     return "null";
             }

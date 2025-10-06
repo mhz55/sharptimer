@@ -58,6 +58,30 @@
     "color": "{darkred}",
     "icon": "https://raw.githubusercontent.com/Letaryat/poor-SharpTimer/main/remote_data/rank_icons/god.gif"
   },
+  "Rank14": {
+    "title": "[#5]",
+    "placement": 5,
+    "color": "{darkred}",
+    "icon": "https://raw.githubusercontent.com/Letaryat/poor-SharpTimer/main/remote_data/rank_icons/god.gif"
+  },
+  "Rank13": {
+    "title": "[#4]",
+    "placement": 4,
+    "color": "{darkred}",
+    "icon": "https://raw.githubusercontent.com/Letaryat/poor-SharpTimer/main/remote_data/rank_icons/god.gif"
+  },
+  "Rank12": {
+    "title": "[#3]",
+    "placement": 3,
+    "color": "{darkred}",
+    "icon": "https://raw.githubusercontent.com/Letaryat/poor-SharpTimer/main/remote_data/rank_icons/god.gif"
+  },
+  "Rank11": {
+    "title": "[#2]",
+    "placement": 2,
+    "color": "{darkred}",
+    "icon": "https://raw.githubusercontent.com/Letaryat/poor-SharpTimer/main/remote_data/rank_icons/god.gif"
+  },
   "Rank10": {
     "title": "[#1]",
     "placement": 1,

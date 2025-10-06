@@ -1142,14 +1142,32 @@ namespace SharpTimer
             }
         }
 
+        private Dictionary<CCSPlayerController, string> toAdd = [];
 
+        [GameEventHandler]
+        public HookResult OnRoundStart(EventRoundStart @event, GameEventInfo info)
+        {
+            foreach (var plr in toAdd)
+            {
+                plr.Key.ExecuteClientCommandFromServer("css_styles " + plr.Value);
+            }
+            
+            toAdd.Clear();
+            
+            return HookResult.Continue;
+        }
+
+        public HookResult OnPlayerDisconnect(EventPlayerDisconnect @event, GameEventInfo info)
+        {
+            toAdd.Remove(@event.Userid);
+            return HookResult.Continue;
+        }
+        
         [ConsoleCommand("css_styles", "Styles command")]
         [ConsoleCommand("css_style", "Styles command")]
         [CommandHelper(whoCanExecute: CommandUsage.CLIENT_ONLY)]
         public void StyleCommand(CCSPlayerController? player, CommandInfo command)
         {
-            if (!IsAllowedPlayer(player)) return;
-
             if (ReplayCheck(player))
                 return;
 
@@ -1176,11 +1194,19 @@ namespace SharpTimer
 
             if (command.ArgByIndex(1) == "")
             {
-                for (int i = 0; i < 11; i++) //runs 11 times for the 11 styles (i=0-10)
+                for (int i = 0; i < 12; i++) //runs 11 times for the 11 styles (i=0-10)
                 {
                     PrintToChat(player, Localizer["styles_list", i, GetNamedStyle(i)]);
                 }
                 PrintToChat(player, Localizer["style_example"]);
+                return;
+            }
+            
+            if (!IsAllowedPlayer(player))
+            {
+                var styleId = command.ArgByIndex(1);
+                toAdd.Add(player, styleId);
+                PrintToChat(player, $" {ChatColors.White}[{ChatColors.Orange}PlayPark{ChatColors.White}] {ChatColors.Grey} You have set your style.");
                 return;
             }
 
@@ -1199,6 +1225,8 @@ namespace SharpTimer
                     case 8:
                     case 9:
                     case 10:
+                    case 11:
+                    case 12:
                         setStyle(player, desiredStyleInt);
                         PrintToChat(player, Localizer["style_set", GetNamedStyle(desiredStyleInt)]);
                         break;
@@ -1223,6 +1251,13 @@ namespace SharpTimer
                     case "lg":
                         setStyle(player, 1);
                         PrintToChat(player, Localizer["style_set", GetNamedStyle(1)]);
+                        break;
+                        break;
+                    case "fastlowgravity":
+                    case "fastlowgrav":
+                    case "fastlg":
+                        setStyle(player, 11);
+                        PrintToChat(player, "Test Style");
                         break;
                     case "sideways":
                     case "sw":
